@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pagination</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <!-- Popper JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid p-2 bg-light">
+        <h1 class="text-info">PAGINATION WITH API</h1>
+    </div>
+    <div class="container">
+        <div class="form-outline m-1" style="position: static;">
+            <input type="search" id="search" class="form-control" placeholder="Search Name" onkeyup="search()" />
+        </div>
+        <div id="dataNo">
+        </div>
+        <table class="table table-hover">
+            <thead>
+                <tr class="bg-info">
+                    <th scope="col">S.No</th>
+                    <th scope="col">User ID</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">country</th>
+                </tr>
+            </thead>
+            <tbody id="table">
+                <tr>
+                    <th scope="row">1</th>
+                    <td></td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="page">
+
+        </div>
+        <button class="btn btn-primary" id="0" onclick="fisrtClick(id)">First</button>
+        <button class="btn btn-primary" id="1" onclick="nextClick()">Next</button>
+        <div id="button" style="display: inline;">
+
+        </div>
+        <button class="btn btn-primary" id="-1" onclick="previousClick()">Previous</button>
+        <button class="btn btn-primary" id="last" onclick="lastClick(id)">Last</button>
+    </div>
+    <script>
+        let userId = [];
+        let userName = [];
+        let userCountry = [];
+        let userSlogan = [];
+        let page = 0;
+        let dataNo = 20;
+        let dataId=1;
+        let url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+
+        function fetchData(url) {
+            console.log('yes');
+            fetch(url).then(res => res.json()).then(data => getData(data));
+        }
+
+        function getData(data) {
+            table = '';
+            button = '';
+            userId = [];
+            userName = [];
+            userCountry = [];
+            userSlogan = [];
+            user24Change = [];
+
+            data['data'].forEach((user) => {
+                userId.push(user._id);
+                userName.push(user.name);
+                userCountry.push(user.airline[0].country);
+                userSlogan.push(user.airline[0].slogan);
+            })
+            console.log(userId);
+            for (let i = 0; i < userId.length; i++) {
+                table += `<tr>
+                    <td>${dataId}</td>
+                    <td>${userId[i]}</td>
+                    <td>${userName[i]}</td>
+                    <td>${userCountry[i]}</td>
+                </tr>`
+                dataId+=1;
+            }
+            document.getElementById('table').innerHTML = table;
+            for (i = page + 1; i <= page + 4; i++) {
+                button += `<button class="btn btn-primary btn-sm p-1 m-1" id="${i}" onclick="pageNo(id)">${i + 1}</button>`
+            }
+            document.getElementById('dataNo').innerHTML = `<label>${dataNo - 20}-${dataNo}</label>`;
+            document.getElementById('button').innerHTML = button;
+            document.getElementById('page').innerHTML = `<label>Page ${page + 1}</label>`;
+
+        }
+        function nextClick() {
+            dataNo += 20;
+            console.log('next');
+            page += 1;
+            url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+            console.log(page)
+            fetchData(url);
+
+        }
+        function previousClick() {
+            if (page > 0) {
+                console.log('next');
+                dataNo -= 1;
+                page -= 1;
+                dataId -=40;
+                console.log(dataId)
+                url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+                // console.log(url)
+                fetchData(url);
+            }
+
+        }
+        function fisrtClick(id) {
+            if (page > 0) {
+                console.log('next');
+                dataNo = 20;
+                dataId =1;
+                page = 0;
+                url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+                // console.log(url)
+                fetchData(url);
+            }
+
+        }
+        function lastClick(id) {
+            page = 628;
+            console.log('next');
+            if (page > 0) {
+                dataNo = 628 * userName.length;
+                dataId =(628 * userName.length)-20;
+                url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+                // console.log(url)
+                fetchData(url);
+            }
+
+        }
+        function pageNo(id) {
+            dataNo += 20;
+            console.log('next');
+            page = Number(id);
+            url = 'https://api.instantwebtools.net/v1/passenger?page=' + page + '&size=20';
+            console.log(page)
+            fetchData(url);
+        }
+        function search() { //This function is used to search in the list
+            table = '';
+            query = document.getElementById('search').value.toUpperCase();
+            for (i = 0; i < userName.length; i++) {
+                if (userName[i].toUpperCase().indexOf(query) > -1) {
+                    table += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${userId[i]}</td>
+                    <td>${userName[i]}</td>
+                    <td>${userCountry[i]}</td>
+                </tr>`
+                }
+                else if(userId[i].toUpperCase().indexOf(query) > -1) {
+                    table += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${userId[i]}</td>
+                    <td>${userName[i]}</td>
+                    <td>${userCountry[i]}</td>
+                </tr>`
+            }
+            else if(userCountry[i].toUpperCase().indexOf(query) > -1) {
+                    table += `<tr>
+                    <td>${i + 1}</td>
+                    <td>${userId[i]}</td>
+                    <td>${userName[i]}</td>
+                    <td>${userCountry[i]}</td>
+                </tr>`
+            }
+
+            }
+             if (table == '') {
+                table += "<tr><td>Records Not Found</td></tr>";
+            }
+            console.log(table)
+            button='';
+            for (i = page + 1; i <= page + 4; i++) {
+                button += `<button class="btn btn-primary btn-sm p-1 m-1" id="${i}" onclick="pageNo(id)">${i + 1}</button>`
+            }
+            document.getElementById('dataNo').innerHTML = `<label>${dataNo - 20}-${dataNo}</label>`;
+            document.getElementById('button').innerHTML = button;
+            document.getElementById('table').innerHTML = table;
+            document.getElementById('page').innerHTML = `<label>Page ${page + 1}</label>`;
+        }
+
+        fetchData(url);
+    </script>
+</body>
+
+</html>
